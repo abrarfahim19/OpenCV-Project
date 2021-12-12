@@ -40,7 +40,7 @@ def stackImages(imgArray,scale,lables=[]):
 
 def reorder(myPoints):
 
-    myPoints = myPoints.reshape((4, 2)) # REMOVE EXTRA BRACKET
+    myPoints = myPoints.reshape((4, 2)) # REMOVE EXTRA DIMENSION
     print(myPoints)
     myPointsNew = np.zeros((4, 1, 2), np.int32) # NEW MATRIX WITH ARRANGED POINTS
     add = myPoints.sum(1)
