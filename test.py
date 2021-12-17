@@ -43,11 +43,11 @@ imgPoint = np.float32([[0, 0], [widthImg, 0], [0, heightImg], [widthImg, heightI
 matrix = cv.getPerspectiveTransform(pt1, imgPoint)
 imgWrapColored = cv.warpPerspective(img, matrix, (widthImg, heightImg))
 
-#   Wraping the Mark    ##################
+#   Wraping the Grade    ##################
 pt2 = np.float32(gradePoints)
-imgGradePoint = np.float32([[0, 0], [315, 0], [0, 200], [315, 200]])
-matrixGrade = cv.getPerspectiveTransform(pt2, imgPoint)
-imgGradeWrapColored = cv.warpPerspective(img, matrixGrade, (300, 100))
+imgGradePoint = np.float32([[0, 0], [315, 0], [0, 150], [315, 150]])
+matrixGrade = cv.getPerspectiveTransform(pt2, imgGradePoint)
+imgGradeWrapColored = cv.warpPerspective(img, matrixGrade, (325, 150))
 #cv.imshow('Grade', gradeWrapColored)
 
 #   Threshold of the answer ##############
@@ -86,6 +86,7 @@ for each in range(0, question):
         grading.append(1)
     else:
         grading.append(0)
+
 #print(grading)
 grade = (sum(grading)/question)*100
 print(grade)
@@ -96,21 +97,22 @@ imgResult = utils.showAnswers(imgResult, omrSelection, grading, answer, question
 
 imgRawDrawing = np.zeros_like(imgWrapColored)
 imgRawDrawing = utils.showAnswers(imgRawDrawing, omrSelection, grading, answer, question, choice)
-
 invMatrix = cv.getPerspectiveTransform(imgPoint, pt1)
 imgInvRaw = cv.warpPerspective(imgRawDrawing, invMatrix, (widthImg, heightImg))
 
+imgRawGrade = np.zeros_like(imgGradeWrapColored)
+cv.putText(imgRawGrade, str(int(grade)) + '%', (50, 100), cv.FONT_HERSHEY_COMPLEX, 3, (255, 255, 0), 3)
+invMatrixGrade = cv.getPerspectiveTransform(imgGradePoint, pt2)
+imgGradeWrapColored = cv.warpPerspective(imgRawGrade, invMatrixGrade, (widthImg, heightImg))
+
 imgFinal = img.copy()
 imgFinal = cv.addWeighted(imgFinal,1,imgInvRaw,1,0)
+imgFinal = cv.addWeighted(imgFinal,1,imgGradeWrapColored,1,0)
 
-imgRawGrade = np.zeros_like(imgGradeWrapColored)
-cv.putText(imgRawGrade,str(int(grade))+"%",(50,100),cv.FONT_HERSHEY_COMPLEX,3,(0,255,255),3)
-cv.imshow("Grade",imgRawGrade)
 
-cv.imshow('Final Output',imgFinal)
+cv.imshow('Final Output', imgFinal)
 #   Stacked Images      ##################
 imgBlank = np.zeros_like(img)
-
 imgArray = ([img, imgGray, imgBlur, imgCanny],
             [imgContour, imgMarkContour, imgWrapColored, imgThresh],
             [imgResult, imgRawDrawing, imgInvRaw, imgFinal])
